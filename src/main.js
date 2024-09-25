@@ -13,7 +13,7 @@ export default async ({ req, res, log, error }) => {
     boops = await database.getDocument('web', 'counters', 'veveBoops');
   } catch (err) {
     error(err);
-    return req.send(500);
+    return res.send(500);
   }
 
   const prevCount = boops.previousCount || 0;
@@ -51,8 +51,10 @@ export default async ({ req, res, log, error }) => {
     await database.updateDocument('web', 'counters', 'veveBoops', {
       previousCount: curCount,
     });
+
+    res.send(200);
   } catch (err) {
     error(err);
-    return req.send(500);
+    return res.send(500);
   }
 };
