@@ -41,7 +41,7 @@ export default async ({ req, res, log, error }) => {
 
   try {
     fetch(
-      `https://api.telegram.org/${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
+      `https://api.telegram.org/bot${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
       options
     )
       .then((response) => response.json())
