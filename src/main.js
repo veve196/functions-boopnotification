@@ -19,7 +19,7 @@ export default async ({ req, res, log, error }) => {
   const prevCount = boops.previousCount || 0;
   const curCount = boops.count || 0;
 
-  if (prevCount == curCount) return res.empty();
+  if (prevCount !== curCount) return res.empty();
 
   const boopDif = curCount - prevCount;
   const options = {
