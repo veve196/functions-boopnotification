@@ -52,7 +52,7 @@ export default async ({ req, res, log, error }) => {
       previousCount: curCount,
     });
 
-    res.send(200);
+    return res.send(200);
   } catch (err) {
     error(err);
     return res.send(500);
