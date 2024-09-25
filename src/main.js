@@ -19,7 +19,7 @@ export default async ({ req, res, log, error }) => {
   const prevCount = boops.previousCount || 0;
   const curCount = boops.count || 0;
 
-  if (prevCount !== curCount) return res.empty();
+  if (prevCount == curCount) return res.empty();
 
   const boopDif = curCount - prevCount;
   const options = {
@@ -45,8 +45,8 @@ export default async ({ req, res, log, error }) => {
       options
     )
       .then((response) => response.json())
-      .then((response) => console.log(response))
-      .catch((err) => console.error(err));
+      .then((response) => log(response))
+      .catch((err) => error(err));
 
     await database.updateDocument('web', 'counters', 'veveBoops', {
       previousCount: curCount,
