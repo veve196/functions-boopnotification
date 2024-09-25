@@ -31,7 +31,6 @@ export default async ({ req, res, log, error }) => {
     },
     body: JSON.stringify({
       text: `You got booped ${boopDif} times today! Your current boop count is ${curCount}.`,
-      parse_mode: 'Optional',
       disable_web_page_preview: false,
       disable_notification: false,
       reply_to_message_id: null,
