@@ -1,33 +1,58 @@
-import { Client } from 'node-appwrite';
+import { Client, Database } from 'node-appwrite';
 
-// This is your Appwrite function
-// It's executed each time we get a request
 export default async ({ req, res, log, error }) => {
-  // Why not try the Appwrite SDK?
-  //
-  // const client = new Client()
-  //    .setEndpoint('https://cloud.appwrite.io/v1')
-  //    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
-  //    .setKey(process.env.APPWRITE_API_KEY);
+  const client = new Client()
+    .setEndpoint(process.env.APPWRITE_API_ENDPOINT)
+    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
+    .setKey(process.env.APPWRITE_API_KEY);
 
-  // You can log messages to the console
-  log('Hello, Logs!');
+  const database = new Database(client);
+  let boops;
 
-  // If something goes wrong, log an error
-  error('Hello, Errors!');
-
-  // The `req` object contains the request data
-  if (req.method === 'GET') {
-    // Send a response with the res object helpers
-    // `res.send()` dispatches a string back to the client
-    return res.send('Hello, World!');
+  try {
+    boops = await database.getDocument('web', 'counters', 'veveBoops');
+  } catch (err) {
+    error(err);
+    return req.send(500);
   }
 
-  // `res.json()` is a handy helper for sending JSON
-  return res.json({
-    motto: 'Build like a team of hundreds_',
-    learn: 'https://appwrite.io/docs',
-    connect: 'https://appwrite.io/discord',
-    getInspired: 'https://builtwith.appwrite.io',
-  });
+  const prevCount = boops.previousCount || 0;
+  const curCount = boops.count || 0;
+
+  if (prevCount == curCount) return res.empty();
+
+  const boopDif = curCount - prevCount;
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'User-Agent': 'Telegram Bot SDK',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: `You got booped ${boopDif} times today! Your current boop count is ${curCount}.`,
+      parse_mode: 'Optional',
+      disable_web_page_preview: false,
+      disable_notification: false,
+      reply_to_message_id: null,
+      chat_id: process.env.TELEGRAM_VEVE_ID,
+    }),
+  };
+
+  try {
+    fetch(
+      `https://api.telegram.org/${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
+      options
+    )
+      .then((response) => response.json())
+      .then((response) => console.log(response))
+      .catch((err) => console.error(err));
+
+    await database.updateDocument('web', 'counters', 'veveBoops', {
+      previousCount: curCount,
+    });
+  } catch (err) {
+    error(err);
+    return req.send(500);
+  }
 };
