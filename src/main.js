@@ -18,6 +18,7 @@ export default async ({ req, res, log, error }) => {
   const prevCount = boops.previousCount || 0;
   const curCount = boops.count || 0;
   const boopDif = curCount - prevCount;
+  let text;
 
   if (boopDif === 0) {
     text = 'No boops for you today, you stupid little bitch.';
