@@ -17,10 +17,16 @@ export default async ({ req, res, log, error }) => {
 
   const prevCount = boops.previousCount || 0;
   const curCount = boops.count || 0;
-
-  if (prevCount == curCount) return res.empty();
-
   const boopDif = curCount - prevCount;
+
+  if (boopDif === 0) {
+    text = 'No boops for you today, you stupid little bitch.';
+  } else if (boopDif === 1) {
+    text = 'You got booped once today!';
+  } else {
+    text = `You got booped ${boopDif} times today!`;
+  }
+
   const options = {
     method: 'POST',
     headers: {
@@ -29,7 +35,7 @@ export default async ({ req, res, log, error }) => {
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      text: `You got booped ${boopDif} times today! Your current boop count is ${curCount}.`,
+      text: `${text}\r\nYour current boop count is ${curCount}.`,
       disable_web_page_preview: false,
       disable_notification: false,
       reply_to_message_id: null,
