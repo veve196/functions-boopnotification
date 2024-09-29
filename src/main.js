@@ -10,7 +10,11 @@ export default async ({ req, res, log, error }) => {
   let boops;
 
   try {
-    boops = await database.getDocument('web', 'counters', 'veveBoops');
+    boops = await database.getDocument(
+      process.env.APPRWRITE_DATABASE_ID,
+      process.env.APPRWRITE_COLLECTION_ID,
+      process.env.APPRWRITE_DOCUMENT_ID
+    );
   } catch (err) {
     error(err);
   }
@@ -40,7 +44,7 @@ export default async ({ req, res, log, error }) => {
       disable_web_page_preview: false,
       disable_notification: false,
       reply_to_message_id: null,
-      chat_id: process.env.TELEGRAM_VEVE_ID,
+      chat_id: process.env.TELEGRAM_USER_ID,
     }),
   };
 
