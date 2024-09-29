@@ -57,9 +57,14 @@ export default async ({ req, res, log, error }) => {
       .then((response) => log(response))
       .catch((err) => error(err));
 
-    await database.updateDocument('web', 'counters', 'veveBoops', {
-      previousCount: curCount,
-    });
+    await database.updateDocument(
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_COLLECTION_ID,
+      process.env.APPWRITE_DOCUMENT_ID,
+      {
+        previousCount: curCount,
+      }
+    );
   } catch (err) {
     error(err);
   }
