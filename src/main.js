@@ -11,9 +11,9 @@ export default async ({ req, res, log, error }) => {
 
   try {
     boops = await database.getDocument(
-      process.env.APPRWRITE_DATABASE_ID,
-      process.env.APPRWRITE_COLLECTION_ID,
-      process.env.APPRWRITE_DOCUMENT_ID
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_COLLECTION_ID,
+      process.env.APPWRITE_DOCUMENT_ID
     );
   } catch (err) {
     error(err);
