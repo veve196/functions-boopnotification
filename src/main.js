@@ -17,6 +17,7 @@ export default async ({ req, res, log, error }) => {
     );
   } catch (err) {
     error(err);
+    return res.json({ ok: false, message: "Failed to retrieve current boop count." }, 500);
   }
 
   const prevCount = boops.previousCount || 0;
@@ -48,15 +49,18 @@ export default async ({ req, res, log, error }) => {
     }),
   };
 
-  try {
-    fetch(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
-      options
-    )
-      .then((response) => response.json())
-      .then((response) => log(response))
-      .catch((err) => error(err));
+  fetch(
+    `https://api.telegram.org/bot${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
+    options
+  )
+    .then((response) => response.json())
+    .then((response) => log(response))
+    .catch((err) => {
+      error(err)
+      return res.json({ ok: false, message: "Failed to send message via telegram api." }, 500);
+    });
 
+  try {   
     await database.updateDocument(
       process.env.APPWRITE_DATABASE_ID,
       process.env.APPWRITE_COLLECTION_ID,
@@ -67,7 +71,8 @@ export default async ({ req, res, log, error }) => {
     );
   } catch (err) {
     error(err);
+    return res.json({ ok: false, message: "Failed to update previous boop count." }, 500);
   }
 
-  return res.empty();
+  return res.json({ ok: true, message: 'Boop notification sent sucessfully.' });
 };
