@@ -1,23 +1,26 @@
 import { Client, Databases } from 'node-appwrite';
 
-export default async ({ req, res, log, error }) => {
+export default async ({ req, res, log, error }: any) => {
   const client = new Client()
-    .setEndpoint(process.env.APPWRITE_API_ENDPOINT)
-    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
-    .setKey(process.env.APPWRITE_API_KEY);
+    .setEndpoint(process.env.APPWRITE_API_ENDPOINT!)
+    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID!)
+    .setKey(process.env.APPWRITE_API_KEY!);
 
   const database = new Databases(client);
   let boops;
 
   try {
     boops = await database.getDocument(
-      process.env.APPWRITE_DATABASE_ID,
-      process.env.APPWRITE_COLLECTION_ID,
-      process.env.APPWRITE_DOCUMENT_ID
+      process.env.APPWRITE_DATABASE_ID!,
+      process.env.APPWRITE_COLLECTION_ID!,
+      process.env.APPWRITE_DOCUMENT_ID!
     );
   } catch (err) {
     error(err);
-    return res.json({ ok: false, message: "Failed to retrieve current boop count." }, 500);
+    return res.json(
+      { ok: false, message: 'Failed to retrieve current boop count.' },
+      500
+    );
   }
 
   const prevCount = boops.previousCount || 0;
@@ -54,24 +57,34 @@ export default async ({ req, res, log, error }) => {
     options
   )
     .then((response) => response.json())
+    .then((response) => log(response))
     .catch((err) => {
-      error(err)
-      return res.json({ ok: false, message: "Failed to send message via telegram api." }, 500);
+      error(err);
+      return res.json(
+        { ok: false, message: 'Failed to send message via telegram api.' },
+        500
+      );
     });
 
-  try {   
+  try {
     await database.updateDocument(
-      process.env.APPWRITE_DATABASE_ID,
-      process.env.APPWRITE_COLLECTION_ID,
-      process.env.APPWRITE_DOCUMENT_ID,
+      process.env.APPWRITE_DATABASE_ID!,
+      process.env.APPWRITE_COLLECTION_ID!,
+      process.env.APPWRITE_DOCUMENT_ID!,
       {
         previousCount: curCount,
       }
     );
   } catch (err) {
     error(err);
-    return res.json({ ok: false, message: "Failed to update previous boop count." }, 500);
+    return res.json(
+      { ok: false, message: 'Failed to update previous boop count.' },
+      500
+    );
   }
 
-  return res.json({ ok: true, message: 'Boop notification sent sucessfully.' }, 200);
+  return res.json(
+    { ok: true, message: 'Boop notification sent sucessfully.' },
+    200
+  );
 };
