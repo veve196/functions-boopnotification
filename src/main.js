@@ -54,7 +54,6 @@ export default async ({ req, res, log, error }) => {
     options
   )
     .then((response) => response.json())
-    .then((response) => log(response))
     .catch((err) => {
       error(err)
       return res.json({ ok: false, message: "Failed to send message via telegram api." }, 500);
@@ -74,5 +73,5 @@ export default async ({ req, res, log, error }) => {
     return res.json({ ok: false, message: "Failed to update previous boop count." }, 500);
   }
 
-  return res.json({ ok: true, message: 'Boop notification sent sucessfully.' });
+  return res.json({ ok: true, message: 'Boop notification sent sucessfully.' }, 200);
 };
