@@ -6,11 +6,11 @@ export default async ({ req, res, log, error }: any) => {
     .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID!)
     .setKey(process.env.APPWRITE_API_KEY!);
 
-  const database = new Databases(client);
+  const databases = new Databases(client);
   let boops;
 
   try {
-    boops = await database.getDocument(
+    boops = await databases.getDocument(
       process.env.APPWRITE_DATABASE_ID!,
       process.env.APPWRITE_COLLECTION_ID!,
       process.env.APPWRITE_DOCUMENT_ID!
@@ -67,7 +67,7 @@ export default async ({ req, res, log, error }: any) => {
     });
 
   try {
-    await database.updateDocument(
+    await databases.updateDocument(
       process.env.APPWRITE_DATABASE_ID!,
       process.env.APPWRITE_COLLECTION_ID!,
       process.env.APPWRITE_DOCUMENT_ID!,

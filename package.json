@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/main.js",
-    "type": "module",
-    "scripts": {
-      "format": "prettier --write .",
-      "build": "tsc"
-    },
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write .",
+    "build": "tsc"
+  },
   "dependencies": {
     "node-appwrite": "^14.1.0",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
-    "@types/node": "^20.12.12",
+    "@types/node": "^22.10.5",
     "prettier": "^3.2.5"
   }
 }
