@@ -48,7 +48,7 @@ export default async ({ req, res, log, error }: any) => {
       disable_web_page_preview: false,
       disable_notification: false,
       reply_to_message_id: null,
-      chat_id: process.env.TELEGRAM_USER_ID,
+      chat_id: process.env.TELEGRAM_RECIPIENT_ID,
     }),
   };
 
