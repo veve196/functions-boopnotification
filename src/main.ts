@@ -1,4 +1,5 @@
 import { Client, Databases } from 'node-appwrite';
+import { formatMessage } from './helper.js';
 
 export default async ({ req, res, log, error }: any) => {
   const client = new Client()
@@ -23,18 +24,27 @@ export default async ({ req, res, log, error }: any) => {
     );
   }
 
-  const prevCount = boops.previousCount || 0;
-  const curCount = boops.count || 0;
-  const boopDif = curCount - prevCount;
-  let text;
+  const prevBoops = boops.previousCount || 0;
+  const totalBoops = boops.count || 0;
+  const todayBoops = totalBoops - prevBoops;
+  let template: string;
 
-  if (boopDif === 0) {
-    text = 'No boops for you today, you stupid little bitch.';
-  } else if (boopDif === 1) {
-    text = 'You got booped once today!';
+  if (todayBoops === 0) {
+    template =
+      process.env.MESSAGE_NO_BOOPS ||
+      'No boops for you today, you stupid little bitch.';
+  } else if (todayBoops === 1) {
+    template = process.env.MESSAGE_SINGLE_BOOP || 'You got booped once today!';
   } else {
-    text = `You got booped ${boopDif} times today!`;
+    template =
+      process.env.MESSAGE_MULTIPLE_BOOPS ||
+      'You got booped {todayBoops} times today!';
   }
+
+  const text = formatMessage(template, {
+    todayBoops: todayBoops,
+    totalBoops: totalBoops,
+  });
 
   const options = {
     method: 'POST',
@@ -44,7 +54,7 @@ export default async ({ req, res, log, error }: any) => {
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      text: `${text}\r\nYour current boop count is ${curCount}.`,
+      text: `${text}\r\nYour current boop count is ${totalBoops}.`,
       disable_web_page_preview: false,
       disable_notification: false,
       reply_to_message_id: null,
@@ -52,19 +62,27 @@ export default async ({ req, res, log, error }: any) => {
     }),
   };
 
-  fetch(
-    `https://api.telegram.org/bot${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
-    options
-  )
-    .then((response) => response.json())
-    .then((response) => log(response))
-    .catch((err) => {
-      error(err);
+  try {
+    const tgResponse = await fetch(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_NOTIFICATIONS_TOKEN}/sendMessage`,
+      options
+    );
+    const tgResult = await tgResponse.json();
+
+    if (!tgResponse.ok) {
+      error(tgResult);
       return res.json(
         { ok: false, message: 'Failed to send message via telegram api.' },
         500
       );
-    });
+    }
+  } catch (err) {
+    error(err);
+    return res.json(
+      { ok: false, message: 'Failed to send message via telegram api.' },
+      500
+    );
+  }
 
   try {
     await databases.updateDocument(
@@ -72,7 +90,7 @@ export default async ({ req, res, log, error }: any) => {
       process.env.APPWRITE_COLLECTION_ID!,
       process.env.APPWRITE_DOCUMENT_ID!,
       {
-        previousCount: curCount,
+        previousCount: totalBoops,
       }
     );
   } catch (err) {
